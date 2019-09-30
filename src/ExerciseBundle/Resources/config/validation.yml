@@ -14,3 +14,10 @@ ExerciseBundle\Entity\Knight:
             - Type:
                 type: integer
                 message: The value {{ value }} is not a valid type {{ type }}.
+        weaponPower:
+            - NotBlank: ~
+            - NotNull: ~
+            - Type:
+                type: integer
+                message: The value {{ value }} is not a valid type {{ type }}.     
+           

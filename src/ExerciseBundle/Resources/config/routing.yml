@@ -8,7 +8,7 @@ post_knight:
         _method: POST
 
 get_knights:
-    pattern: /knight
+    pattern: /knight/{limit}/{offset}
     defaults: { _controller: ExerciseBundle:Knight:getKnights, _format: json }
     requirements:
         _method: GET

@@ -3,6 +3,7 @@
 namespace ExerciseBundle\Handler;
 
 use FOS\RestBundle\View\View;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Interface HandlerInterface
@@ -19,7 +20,7 @@ interface HandlerInterface
      * @param int $id
      * @return Object
      */
-    public function get($id);
+    public function getKnightAction(int $id);
 
     /**
      * Get a collection of resources
@@ -28,13 +29,12 @@ interface HandlerInterface
      * @param int $offset
      * @return array
      */
-    public function all($limit, $offset);
+    public function getKnightsAction(int $limit, int $offset);
 
     /**
      * Register a resource
      *
-     * @param $resource
      * @return mixed
      */
-    public function post($resource);
+    public function postKnightAction();
 }

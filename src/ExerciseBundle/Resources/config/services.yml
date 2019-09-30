@@ -1,13 +1,16 @@
 parameters:
     exercise.knight.handler.class: ExerciseBundle\Handler\KnightHandler
+    exercise.services.arena.class: ExerciseBundle\Services\Arena
     exercise.knight.class: ExerciseBundle\Entity\Knight
 #    exercise.example.class: ExerciseBundle\Example
 
 services:
     exercise.knight.handler:
         class: %exercise.knight.handler.class%
-        arguments: [ @doctrine.orm.entity_manager, %exercise.knight.class%, @form.factory ]
-
+        arguments: [ @doctrine.orm.entity_manager, %exercise.knight.class%, @form.factory ]   
+    exercise.services.arena:
+        class: %exercise.services.arena.class%
+        public: true
 #    exercise.example:
 #        class: %exercise.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
