@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Human
@@ -15,7 +16,7 @@ abstract class Human
 {
     /**
      * @var string
-     *
+     * @Assert\NotBlank(message = "Please enter a name")
      * @ORM\Column(name="name", type="string", length=255)
      */
     protected $name;
