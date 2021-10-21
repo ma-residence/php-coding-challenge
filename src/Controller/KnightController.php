@@ -3,29 +3,31 @@
 namespace App\Controller;
 
 use App\Entity\Knight;
-use App\Repository\KnightRepository;
-use Doctrine\ORM\Exception\ORMException;
+use App\Handler\addKnightDataObject;
+use App\Handler\KnightHandler;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Throwable;
 
 class KnightController extends AbstractController
 {
-    private KnightRepository $knightRepository;
     private LoggerInterface $logger;
+    private KnightHandler $knightHandler;
 
     /**
-     * @param KnightRepository $knightRepository
      * @param LoggerInterface $logger
+     * @param KnightHandler $knightHandler
      */
-    public function __construct(KnightRepository $knightRepository
-        , LoggerInterface $logger
+    public function __construct(LoggerInterface $logger
+        , KnightHandler $knightHandler
     )
     {
         $this->logger = $logger;
-        $this->knightRepository = $knightRepository;
+        $this->knightHandler = $knightHandler;
     }
 
     private function handleInvalidRequest(
@@ -58,7 +60,6 @@ class KnightController extends AbstractController
      * , name="addKnight"
      * , methods={"POST"}
      * )
-     * @throws \Doctrine\ORM\ORMException
      */
     public function add(Request $request): JsonResponse
     {
@@ -69,23 +70,12 @@ class KnightController extends AbstractController
             return $this->handleInvalidRequest();
         }
 
-        $data = json_decode($request->getContent());
-
-        if (empty($data->name) || empty($data->strength) || empty($data->weaponPower)) {
-            return $this->handleInvalidRequest(
-                  'form is not valid'
-                , Knight::API_INVALID_PAYLOAD_DATA
-                , $data
-                , Knight::API_STATUS_400
-            );
-        }
-
-        $em = $this->getDoctrine()->getManager();
-        $knight = new Knight($data->name, $data->strength, $data->weaponPower);
+        $data = $request->getContent();
+        //todo: implement a custom denormalizer
 
         try {
-            $em->persist($knight);
-            $em->flush();
+            $addKnightDataObject = addKnightDataObject::getInstanceFromJson($data);
+            $knight = $this->knightHandler->post($addKnightDataObject);
 
             return $this->json([
                 'message' => Knight::API_ADD_MESSAGE_SUCCESS,
@@ -93,17 +83,18 @@ class KnightController extends AbstractController
                 'data' => $knight,
                 'code' => Knight::API_STATUS_201,
             ], Knight::API_STATUS_201);
-        } catch (ORMException $exception) {
-            $this->logger->error(Knight::API_ADD_MESSAGE_ERROR);
+
+        } catch (Throwable $exception) {
+            $this->logger->error(Knight::API_GET_ERROR_NOT_FOUND);
             $this->logger->error($exception->getCode());
             $this->logger->error($exception->getMessage());
 
-            return $this->json([
-                'message' => Knight::API_ADD_MESSAGE_ERROR,
-                'error' => $exception->getMessage(),
-                'data' => null,
-                'code' => Knight::API_STATUS_400,
-            ], Knight::API_STATUS_400);
+            return $this->handleInvalidRequest(
+                Knight::API_GET_ERROR_NOT_FOUND,
+                $exception->getMessage(),
+                $data,
+                Knight::API_STATUS_400,
+            );
         }
     }
 
@@ -126,23 +117,27 @@ class KnightController extends AbstractController
             );
         }
 
-        $knight = $this->knightRepository->findOneBy(['id' => $id]);
-        if ($knight) {
+        try {
+            $knight = $this->knightHandler->get($id);
+
+            /*knight found response*/
             return $this->json([
                 'message' => Knight::API_GET_SUCCESS,
                 'error' => null,
                 'data' => $knight,
                 'code' => Knight::API_STATUS_200,
             ], Knight::API_STATUS_200);
+        } catch (NotFoundHttpException $exception) {
+            /*knight not found response*/
+            return $this->json([
+                //todo: build the error message
+                'message' => 'Knight #' . $id . ' not found.',
+                'error' => $exception->getMessage(),
+                'data' => null,
+                'code' => Knight::API_STATUS_404,
+            ], Knight::API_STATUS_404);
         }
 
-        /*not found response*/
-        return $this->json([
-            'message' => 'Knight #' . $id . ' not found.',
-            'error' => Knight::API_GET_ERROR_NOT_FOUND,
-            'data' => null,
-            'code' => Knight::API_STATUS_404,
-        ], Knight::API_STATUS_404);;
     }
 
     /**
@@ -154,7 +149,7 @@ class KnightController extends AbstractController
     {
         $this->logger->info($request);
 
-        $allKnights = $this->knightRepository->findAll();
+        $allKnights = $this->knightHandler->all();
 
         return $this->json([
             'message' => Knight::API_GET_SUCCESS,

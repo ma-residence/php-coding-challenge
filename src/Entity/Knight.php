@@ -16,7 +16,8 @@ class Knight extends Human implements FightInterface
 
     const API_GET_SUCCESS = 'OK';
     const API_GET_ERROR = 'KO';
-    const API_GET_ERROR_NOT_FOUND = 'Hmm this is not the dro... knight you\'re looking for.';
+    //const API_GET_ERROR_NOT_FOUND = 'Hmm this is not the dro... knight you\'re looking for.';
+    const API_GET_ERROR_NOT_FOUND = 'form is not valid';
     const API_INVALID_PAYLOAD = 'form is not valid';
     const API_MESSAGE_JSON_ONLY = 'Json only is accepted. Please check you headers';
     const API_INVALID_PAYLOAD_DATA = 'Invalid payload. Please check the sent datas';
