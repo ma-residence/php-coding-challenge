@@ -15,7 +15,6 @@ class KnightController extends AbstractController
 {
     private KnightRepository $knightRepository;
     private LoggerInterface $logger;
-    private Request $request;
 
     /**
      * @param KnightRepository $knightRepository
@@ -26,7 +25,6 @@ class KnightController extends AbstractController
     )
     {
         $this->logger = $logger;
-        $this->request = Request::createFromGlobals();
         $this->knightRepository = $knightRepository;
     }
 
@@ -40,7 +38,8 @@ class KnightController extends AbstractController
         return $this->json([
             'message' => $message,
             'error' => $error,
-            'data' => $data,
+            'data' => $data ?? Request::createFromGlobals()->getContent(),
+            'code' => $status,
         ], $status);
     }
 
@@ -61,19 +60,20 @@ class KnightController extends AbstractController
      * )
      * @throws \Doctrine\ORM\ORMException
      */
-    public function add(): JsonResponse
+    public function add(Request $request): JsonResponse
     {
-        $this->logger->info($this->request);
+        $this->logger->info($request);
 
         /*json only allowed*/
-        if (!$this->isValidRequest($this->request)) {
+        if (!$this->isValidRequest($request)) {
             return $this->handleInvalidRequest();
         }
 
-        $data = json_decode($this->request->getContent());
-        if (!$data->name || !$data->strength || !$data->weaponPower) {
+        $data = json_decode($request->getContent());
+
+        if (empty($data->name) || empty($data->strength) || empty($data->weaponPower)) {
             return $this->handleInvalidRequest(
-                  Knight::API_ADD_MESSAGE_ERROR
+                  'form is not valid'
                 , Knight::API_INVALID_PAYLOAD_DATA
                 , $data
                 , Knight::API_STATUS_400
@@ -91,6 +91,7 @@ class KnightController extends AbstractController
                 'message' => Knight::API_ADD_MESSAGE_SUCCESS,
                 'error' => null,
                 'data' => $knight,
+                'code' => Knight::API_STATUS_201,
             ], Knight::API_STATUS_201);
         } catch (ORMException $exception) {
             $this->logger->error(Knight::API_ADD_MESSAGE_ERROR);
@@ -101,6 +102,7 @@ class KnightController extends AbstractController
                 'message' => Knight::API_ADD_MESSAGE_ERROR,
                 'error' => $exception->getMessage(),
                 'data' => null,
+                'code' => Knight::API_STATUS_400,
             ], Knight::API_STATUS_400);
         }
     }
@@ -111,9 +113,9 @@ class KnightController extends AbstractController
      * , methods={"GET"}
      * , defaults={"id"=null})
      */
-    public function fetch($id) :JsonResponse
+    public function fetch($id, Request $request) :JsonResponse
     {
-        $this->logger->info($this->request);
+        $this->logger->info($request);
 
         if (is_null( $id )) {
             return $this->handleInvalidRequest(
@@ -130,14 +132,16 @@ class KnightController extends AbstractController
                 'message' => Knight::API_GET_SUCCESS,
                 'error' => null,
                 'data' => $knight,
+                'code' => Knight::API_STATUS_200,
             ], Knight::API_STATUS_200);
         }
 
         /*not found response*/
         return $this->json([
-            'message' => Knight::API_GET_ERROR,
+            'message' => 'Knight #' . $id . ' not found.',
             'error' => Knight::API_GET_ERROR_NOT_FOUND,
             'data' => null,
+            'code' => Knight::API_STATUS_404,
         ], Knight::API_STATUS_404);;
     }
 
@@ -146,9 +150,9 @@ class KnightController extends AbstractController
      * , name="getKnights"
      * , methods={"GET"})
      */
-    public function fetchAll() :JsonResponse
+    public function fetchAll(Request $request) :JsonResponse
     {
-        $this->logger->info($this->request);
+        $this->logger->info($request);
 
         $allKnights = $this->knightRepository->findAll();
 
@@ -156,6 +160,7 @@ class KnightController extends AbstractController
             'message' => Knight::API_GET_SUCCESS,
             'error' => null,
             'data' => $allKnights,
+            'code' => Knight::API_STATUS_200,
         ], Knight::API_STATUS_200);
     }
 }
