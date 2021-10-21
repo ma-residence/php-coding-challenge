@@ -3,24 +3,20 @@
 namespace App\Entity;
 
 use App\Repository\KnightRepository;
+use App\Entity\Human;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=KnightRepository::class)
  */
-class Knight implements FightInterface
+class Knight extends Human implements FightInterface
 {
     /**
-     * @ORM\Id
+     * @ORM\Idé
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
     private $id;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $name;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -44,18 +40,6 @@ class Knight implements FightInterface
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function getName(): ?int
-    {
-        return $this->name;
-    }
-
-    public function setName(?int $name): self
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getWeaponPower(): ?int
