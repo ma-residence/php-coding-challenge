@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\KnightRepository;
-use App\Entity\Human;
+use App\Entity\AbstractHuman as Human;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -11,22 +11,37 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Knight extends Human implements FightInterface
 {
+    const API_ADD_MESSAGE_SUCCESS = 'Welcome to the round table Sir.';
+    const API_ADD_MESSAGE_ERROR = 'Ouch something bad happened while dubbing this knight. Please check his virtue.';
+
+    const API_GET_SUCCESS = 'OK';
+    const API_GET_ERROR = 'KO';
+    const API_GET_ERROR_NOT_FOUND = 'Hmm this is not the dro... knight you\'re looking for.';
+    const API_INVALID_PAYLOAD = 'Invalid payload';
+    const API_MESSAGE_JSON_ONLY = 'Json only is accepted. Please check you "Content-Type header"';
+    const API_INVALID_PAYLOAD_DATA = 'Invalid payload. Please check the sent datas';
+
+    const API_STATUS_200 = 200;
+    const API_STATUS_201 = 201;
+    const API_STATUS_400 = 400;
+    const API_STATUS_404 = 404;
+
     /**
      * @ORM\Idé
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $weaponPower;
+    private ?int $weaponPower;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $strength;
+    private ?int $strength;
 
     public function __construct(?string $name, int $strength=0, $weaponPower=0)
     {
