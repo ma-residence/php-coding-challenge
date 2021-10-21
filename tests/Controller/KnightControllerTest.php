@@ -45,8 +45,8 @@ class KnightControllerTest extends WebTestCase
 
         self::assertArrayHasKey('code', $content);
         self::assertArrayHasKey('message', $content);
-        self::assertEquals($content['code'], Response::HTTP_BAD_REQUEST);
-        self::assertEquals($content['message'], 'form is not valid');
+        self::assertEquals(Response::HTTP_BAD_REQUEST, $content['code']);
+        self::assertEquals('form is not valid', $content['message']);
     }
 
     public function testGetKnightAll()
