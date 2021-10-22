@@ -16,7 +16,6 @@ class KnightControllerTest extends WebTestCase
             '{"name":"Bipolelm","strength":10,"weaponPower":20}'
         );
 
-
         self::assertEquals(201, $client->getResponse()->getStatusCode());
     }
 
@@ -45,8 +44,8 @@ class KnightControllerTest extends WebTestCase
 
         self::assertArrayHasKey('code', $content);
         self::assertArrayHasKey('message', $content);
-        self::assertEquals($content['code'], Response::HTTP_BAD_REQUEST);
-        self::assertEquals($content['message'], 'form is not valid');
+        self::assertEquals(Response::HTTP_BAD_REQUEST, $content['code']);
+        self::assertEquals('form is not valid', $content['message']);
     }
 
     public function testGetKnightAll()
@@ -59,13 +58,13 @@ class KnightControllerTest extends WebTestCase
 
         self::assertEquals(200, $client->getResponse()->getStatusCode());
 
-        self::assertArrayHasKey('id', $content[0]);
-        self::assertArrayHasKey('name', $content[0]);
-        self::assertArrayHasKey('strength', $content[0]);
-        self::assertArrayHasKey('weaponPower', $content[0]);
+        self::assertArrayHasKey('id', $content['data'][0]);
+        self::assertArrayHasKey('name', $content['data'][0]);
+        self::assertArrayHasKey('strength', $content['data'][0]);
+        self::assertArrayHasKey('weaponPower', $content['data'][0]);
 
-        self::assertEquals(1, $content[0]['id']);
-        self::assertGreaterThan(2, $content);
+        self::assertEquals(1, $content['data'][0]['id']);
+        self::assertGreaterThan(2, $content['data']);
     }
 
     public function testGetKnightNotFound()

@@ -15,7 +15,7 @@ interface HandlerInterface
      * @param int $id
      * @return Object
      */
-    public function get($id);
+    public function get(int $id) :object;
 
     /**
      * Get a collection of resources
@@ -24,7 +24,7 @@ interface HandlerInterface
      * @param int $offset
      * @return array
      */
-    public function all($limit, $offset);
+    public function all(int $limit, int $offset) :array;
 
     /**
      * Register a resource

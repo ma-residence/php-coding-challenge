@@ -11,21 +11,21 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\MappedSuperclass
  */
-abstract class Human
+abstract class AbstractHuman
 {
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
      */
-    protected $name;
+    protected string $name;
     /**
      * Set name
      *
      * @param string $name
-     * @return Human
+     * @return AbstractHuman
      */
-    public function setName($name)
+    public function setName(string $name) :self
     {
         $this->name = $name;
         return $this;
@@ -35,7 +35,7 @@ abstract class Human
      *
      * @return string
      */
-    public function getName()
+    public function getName() :string
     {
         return $this->name;
     }
