@@ -12,7 +12,7 @@ class ArenaTest extends WebTestCase
      */
     private $em;
 
-    public function setUp()
+    public function setUp() :void
     {
         static::$kernel = static::createKernel();
         static::$kernel->boot();
@@ -27,6 +27,6 @@ class ArenaTest extends WebTestCase
 
         $result = (new Arena())->fight($knight, $knight2);
 
-        $this->assertEquals($result, -1);
+        $this->assertEquals(-1, $result);
     }
 }
